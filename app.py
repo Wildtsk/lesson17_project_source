@@ -6,6 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from marshmallow import Schema, fields
 
 app = Flask(__name__)
+api = Api(app)
+moves_ns = api.namespace('moves')
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -36,6 +39,7 @@ class Genre(db.Model):
     name = db.Column(db.String(255))
 
 
+class MoviesView(Resource):
 
 if __name__ == '__main__':
     app.run(debug=True)
