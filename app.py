@@ -76,25 +76,27 @@ class MovieView(Resource):
 
     def put(self, uid): #/movies/<int:uid> — обновляет 1 фильм;
         data = request.json
-        try:
-            result = Movie.query.filter(Movie.id == uid).one()
-            result.title = data.get('title')
-            db.session.add(result)
-            db.session.commit()
-            return "", 201
-        except Exception:
-            db.session.rollback()
-            return "Ошибка в обновлении", 200
+        result = Movie.query.get(uid)
+        result.title = data['title']
+        result.description = data['description']
+        result.trailer = data['trailer']
+        result.year = data['year']
+        result.rating = data['rating']
+        result.genre_id = data['genre_id']
+        result.director_id = data['director_id']
+
+        current_db_sessions = db.session.object_session(result)
+        current_db_sessions.add(result)
+        current_db_sessions.commit()
+        return "", 201
 
     def delete(self, uid): #/movies/<int:uid> — удаляет 1 фильм;
-        try:
-            result = Movie.query.filter(Movie.id == uid).one()
-            db.session.add(result)
-            db.session.commit()
-            return "", 201
-        except Exception:
-            db.session.rollback()
-            return "Ошибка при удалении", 200
+        all_movies = Movie.query.get(uid)
+        result = all_movies
+        current_db_sessions = db.session.object_session(result)
+        current_db_sessions.delete(result)
+        current_db_sessions.commit()
+        return "", 204
 
 
 @genres_ns.route('/') #/genres — возвращает список всех фильмов, разделенный по страницам;
